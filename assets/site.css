@@ -711,3 +711,4 @@ input[type="range"]::-moz-range-thumb { width: 18px; height: 18px; border-radius
 .related__item h3 { display: flex; justify-content: space-between; gap: 12px; }
 .related__item h3::after { content: '→'; color: var(--aqua); font-family: var(--f-body); }
 .related__item:hover { background: rgba(239, 232, 220, .04); }
+@media (max-width: 640px) { .ptable--price td.num { white-space: normal; max-width: 42vw; line-height: 1.3; } }

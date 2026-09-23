@@ -29,7 +29,7 @@ ${hero({
     <div data-calc>
       <div class="calc-bar" data-calcbar hidden><div><span class="calc-bar__k">Ваш ориентир бюджета</span><b data-out="bar"></b></div><button type="button" class="calc-bar__btn" data-calcbar-go>Подробнее</button></div>
       <div class="calc__tabs" role="tablist" data-tabs aria-label="Тип объекта">
-        <button type="button" role="tab" id="tab-home" aria-controls="pane-home" aria-selected="true">Дом или квартира</button>
+        <button type="button" role="tab" id="tab-home" aria-controls="pane-home" aria-selected="true">Дом, квартира</button>
         <button type="button" role="tab" id="tab-office" aria-controls="pane-office" aria-selected="false" tabindex="-1">Офис</button>
       </div>
 

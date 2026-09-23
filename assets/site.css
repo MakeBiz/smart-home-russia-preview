@@ -659,7 +659,7 @@ input[type="range"]::-moz-range-thumb { width: 18px; height: 18px; border-radius
   .hero__media { position: relative; inset: auto; height: clamp(300px, 56svh, 460px); z-index: 0; flex: none; }
   .hero__media img { animation: none; transform: none; }
   .hero__veil { inset: 0 0 auto 0; height: clamp(300px, 56svh, 460px); z-index: 1;
-    background: linear-gradient(180deg, rgba(12, 17, 22, .7) 0%, rgba(12, 17, 22, 0) 28%, rgba(12, 17, 22, .15) 55%, var(--ink) 100%); }
+    background: linear-gradient(180deg, rgba(12, 17, 22, .65) 0%, rgba(12, 17, 22, 0) 24%, rgba(12, 17, 22, .35) 46%, rgba(12, 17, 22, .9) 70%, var(--ink) 92%); }
   .hero__inner { position: relative; z-index: 2; margin-top: -150px; padding-block: 0 40px; }
   .hero--short .hero__media, .hero--short .hero__veil { height: clamp(240px, 40svh, 340px); }
   .hero--short .hero__inner { margin-top: -110px; }

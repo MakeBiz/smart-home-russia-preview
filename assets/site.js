@@ -56,6 +56,12 @@
     }, 1800);
   });
 
+  /* analytics goals (Yandex Metrika): lead, lead_error, calc_start, calc_office, cta_lead, cta_pricing, form_focus */
+  const goal = (name, params) => { try { const S0 = window.SITE || {}; if (window.ym && S0.metrika) window.ym(S0.metrika, 'reachGoal', name, params || {}); } catch (e) { /* ignore */ } };
+  window.shGoal = goal;
+  d.addEventListener('click', (e) => { const a = e.target.closest('a'); if (!a) return; const h = a.getAttribute('href') || ''; if (h.endsWith('#lead') || /contact\/?$/.test(h)) goal('cta_lead', { page: location.pathname }); else if (/pricing\/?(#.*)?$/.test(h)) goal('cta_pricing', { page: location.pathname }); });
+  let focused = false; d.addEventListener('focusin', (e) => { if (!focused && e.target.closest && e.target.closest('[data-form]')) { focused = true; goal('form_focus', { page: location.pathname }); } });
+
   /* ---------- calculator ---------- */
   const calc = d.querySelector('[data-calc]');
   if (calc) {
@@ -175,8 +181,8 @@
       try { if (calc.dataset.touched) sessionStorage.setItem('shr_estimate', calc.dataset.summary); } catch (e) { /* storage unavailable */ }
     };
 
-    calc.addEventListener('input', (e) => { calc.dataset.touched = '1'; if (e.target.closest('[data-office]')) office(); else compute(); });
-    calc.addEventListener('change', (e) => { calc.dataset.touched = '1'; if (e.target.closest('[data-office]')) office(); else compute(); });
+    calc.addEventListener('input', (e) => { if (!calc.dataset.touched) goal(e.target.closest('[data-office]') ? 'calc_office' : 'calc_start'); calc.dataset.touched = '1'; if (e.target.closest('[data-office]')) office(); else compute(); });
+    calc.addEventListener('change', (e) => { if (!calc.dataset.touched) goal(e.target.closest('[data-office]') ? 'calc_office' : 'calc_start'); calc.dataset.touched = '1'; if (e.target.closest('[data-office]')) office(); else compute(); });
     const h = location.hash.replace('#', '');
     if (['apartment', 'townhouse', 'house'].includes(h)) {
       const r = calc.querySelector(`[name="type"][value="${h}"]`); if (r) r.checked = true;
@@ -249,7 +255,7 @@
         role: fd.get('role') || '', message: (fd.get('message') || '').trim(), estimate,
         page: location.href.split('#')[0], title: document.title, referrer: ref, utm,
       };
-      function done() { f.querySelector('[data-ok]').hidden = false; f.querySelectorAll('.field, .form__foot, .consent').forEach((x) => (x.hidden = true)); showErr(''); try { if (window.ym && S.metrika) window.ym(S.metrika, 'reachGoal', 'lead'); } catch (x) { /* ignore */ } }
+      function done() { f.querySelector('[data-ok]').hidden = false; f.querySelectorAll('.field, .form__foot, .consent').forEach((x) => (x.hidden = true)); showErr(''); goal('lead', { page: location.pathname, telegram: !!tg }); }
       if (!S.formEndpoint) { showErr('Форма ещё не подключена. Попробуйте позже.'); return; }
       btnEl.disabled = true; btnEl.querySelector('span').textContent = 'Отправляем…';
       try {
@@ -260,7 +266,7 @@
         if (!r.ok || !j.ok) throw new Error(j.error || 'send');
         done();
       } catch (x) {
-        showErr('Не получилось отправить заявку. Проверьте интернет и попробуйте ещё раз.');
+        showErr('Не получилось отправить заявку. Проверьте интернет и попробуйте ещё раз.'); goal('lead_error');
       } finally { btnEl.disabled = false; btnEl.querySelector('span').textContent = 'Отправить заявку'; }
     });
   });

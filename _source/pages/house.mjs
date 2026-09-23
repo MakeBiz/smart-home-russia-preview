@@ -1,4 +1,5 @@
 import { url, btn, hero, statusPanel, sectionHead, features, split, ctaBand, faq } from '../lib.mjs';
+import { relatedBlock } from './usecases.mjs';
 
 export default {
   path: 'house',
@@ -102,12 +103,14 @@ ${split({
   </div>
 </section>
 
+${relatedBlock(['kotel-udalenno', 'videonablyudenie', 'umnye-vorota', 'obogrev-krovli', 'zashchita-ot-protechek', 'teplyj-pol'], 'Смотрите также')}
+
 ${ctaBand({ photoKey: 'house-stars' })}
 `;
     return {
-      title: 'Умный загородный дом · Отопление, баня, ворота, камеры и ИИ-консьерж',
-      description: 'Автоматизация загородного дома: отопление по комнатам и контроль котла, баня с прогревом к приезду, умные ворота, видеонаблюдение, подогрев дорожек, резервное питание и ИИ-консьерж. Проект, монтаж, сервис.',
-      body, ogPhoto: 'cabin-night',
+      title: 'Умный дом для загородного и частного дома под ключ · Smart Home',
+      description: 'Умный дом для загородного и частного дома: отопление и котёл, баня, ворота, видеонаблюдение, подогрев дорожек, резервное питание, ИИ-консьерж. Проект, монтаж, сервис.',
+      body, service: { name: 'Умный дом для загородного дома под ключ', min: 1840000, max: 9120000 }, ogPhoto: 'cabin-night',
     };
   },
 };

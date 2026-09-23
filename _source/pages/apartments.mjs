@@ -1,4 +1,5 @@
 import { url, btn, hero, statusPanel, sectionHead, features, split, ctaBand, faq, img } from '../lib.mjs';
+import { relatedBlock } from './usecases.mjs';
 
 export default {
   path: 'apartments',
@@ -78,12 +79,14 @@ ${split({
   </div>
 </section>
 
+${relatedBlock(['teplyj-pol', 'zashchita-ot-protechek'], 'Смотрите также')}
+
 ${ctaBand({ photoKey: 'moscow-night-hotel', title: 'Расскажите о своей квартире.', lead: 'Площадь, стадия ремонта, что раздражает сейчас. Короткого звонка хватит, чтобы назвать реальный бюджет и сроки.' })}
 `;
     return {
-      title: 'Умная квартира · Отопление по комнатам, тёплые полы, свет и шторы · Smart Home',
-      description: 'Умная квартира под ключ: температура в каждой комнате при центральном отоплении, тёплые полы по расписанию, свет, шторы, вентиляция, защита от протечек. Для ремонта и готовых квартир. От 690 000 ₽.',
-      body, ogPhoto: 'moscow-embankment',
+      title: 'Умная квартира под ключ: тёплый пол, свет, шторы, протечки · Smart Home',
+      description: 'Умная квартира под ключ: температура в каждой комнате, тёплые полы по расписанию, свет, шторы, вентиляция, защита от протечек. Для ремонта и готовых квартир. От 690 000 ₽.',
+      body, service: { name: 'Умный дом в квартире под ключ', min: 690000, max: 2540000 }, ogPhoto: 'moscow-embankment',
     };
   },
 };

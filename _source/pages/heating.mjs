@@ -1,4 +1,5 @@
 import { url, btn, hero, statusPanel, sectionHead, features, split, ctaBand, faq, img } from '../lib.mjs';
+import { relatedBlock } from './usecases.mjs';
 
 export default {
   path: 'heating',
@@ -84,12 +85,14 @@ ${split({
   </div>
 </section>
 
+${relatedBlock(['kotel-udalenno', 'teplyj-pol', 'zashchita-ot-protechek'], 'Смотрите также')}
+
 ${ctaBand({ photoKey: 'red-cabin-snow', title: 'Расскажите о своём отоплении.', lead: 'Котёл, радиаторы или тёплые полы, сколько контуров. Короткий звонок и один выезд инженера, и вы знаете, что можно сделать и сколько это стоит.' })}
 `;
     return {
-      title: 'Умное отопление · Котёл, тёплые полы и радиаторы по комнатам · Smart Home',
-      description: 'Умное отопление для дома и квартиры: погодозависимое управление котлом, температура в каждой комнате, тёплые полы по расписанию, приточная вентиляция, контроль аварий и резервное питание.',
-      body, ogPhoto: 'window-snow',
+      title: 'Умное отопление дома: котёл, тёплые полы, радиаторы · Smart Home',
+      description: 'Умное отопление для дома и квартиры: погодозависимое управление котлом, температура в каждой комнате, тёплые полы по расписанию, вентиляция, контроль аварий.',
+      body, service: { name: 'Умное отопление и управление котельной', min: 90000 }, ogPhoto: 'window-snow',
     };
   },
 };

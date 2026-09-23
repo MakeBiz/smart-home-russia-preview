@@ -1,4 +1,5 @@
 import { url, btn, hero, statusPanel, sectionHead, features, split, ctaBand, faq, img } from '../lib.mjs';
+import { relatedBlock } from './usecases.mjs';
 
 export default {
   path: 'banya',
@@ -86,12 +87,14 @@ ${split({
   </div>
 </section>
 
+${relatedBlock(['kotel-udalenno', 'teplyj-pol', 'house'], 'Смотрите также')}
+
 ${ctaBand({ photoKey: 'sauna-dark', title: 'Расскажите о своей бане.', lead: 'Печь, размер парной, есть ли купель или джакузи. Короткий звонок и один визит, и вы знаете, что можно сделать и сколько это стоит.' })}
 `;
     return {
-      title: 'Умная баня и сауна · Прогрев к приезду, купель и джакузи · Smart Home',
-      description: 'Автоматизация бани и сауны: прогрев электропечи к назначенному времени, управление с телефона, купель, джакузи и хаммам, вентиляция, защита от перегрева и угарного газа. Пакеты от 110 000 ₽.',
-      body, ogPhoto: 'barrel-sauna-snow',
+      title: 'Умная баня и сауна: прогрев к приезду, купель, джакузи · Smart Home',
+      description: 'Умная баня и сауна: прогрев электропечи к назначенному времени, управление с телефона, купель, джакузи и хаммам, вентиляция, защита от перегрева. От 110 000 ₽.',
+      body, service: { name: 'Автоматизация бани и сауны', min: 110000, max: 480000 }, ogPhoto: 'barrel-sauna-snow',
     };
   },
 };

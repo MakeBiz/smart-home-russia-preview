@@ -1,4 +1,5 @@
 import { url, btn, hero, statusPanel, sectionHead, features, split, ctaBand, faq, img } from '../lib.mjs';
+import { relatedBlock } from './usecases.mjs';
 
 export default {
   path: 'territory',
@@ -95,12 +96,14 @@ ${split({
   </div>
 </section>
 
+${relatedBlock(['umnye-vorota', 'videonablyudenie', 'obogrev-krovli'], 'Смотрите также')}
+
 ${ctaBand({ photoKey: 'snow-road-pines', title: 'Расскажите о своём участке.', lead: 'Размер, ворота, сколько нужно камер, где лежит снег. Один выезд инженера, и у вас план и смета.' })}
 `;
     return {
       title: 'Умные ворота, видеонаблюдение и подогрев дорожек · Smart Home',
-      description: 'Автоматизация участка: ворота по номеру машины, видеодомофон, видеонаблюдение с аналитикой, охрана периметра, подогрев дорожек, кровли и водостоков по датчикам, свет и полив, резервное питание.',
-      body, ogPhoto: 'gate-black',
+      description: 'Автоматизация участка: ворота по номеру машины, видеодомофон, видеонаблюдение с аналитикой, охрана периметра, обогрев дорожек, кровли и водостоков, резервное питание.',
+      body, service: { name: 'Автоматизация участка частного дома', min: 70000 }, ogPhoto: 'gate-black',
     };
   },
 };

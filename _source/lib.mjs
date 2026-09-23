@@ -22,7 +22,8 @@ export const img = (key, alt, { w = 1600, ratio, cls = '', eager = false, sizes 
   const widths = [640, 1024, 1600, 2200].filter((x) => x <= Math.max(w, 640));
   const h = (x) => (ratio ? Math.round(x / ratio) : undefined);
   const srcset = widths.map((x) => `${photo(key, x, h(x))} ${x}w`).join(', ');
-  return `<img class="${cls}" src="${photo(key, w, h(w))}" srcset="${srcset}" sizes="${sizes}" alt="${esc(alt)}" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async">`;
+  const dims = ratio ? ` width="${w}" height="${h(w)}"` : '';
+  return `<img class="${cls}" src="${photo(key, w, h(w))}" srcset="${srcset}" sizes="${sizes}" alt="${esc(alt)}"${dims} ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async">`;
 };
 
 // ---------- navigation ----------
@@ -151,8 +152,46 @@ export const leadForm = ({ partner = false, comment = false, dark = false } = {}
   </form>`;
 };
 
+
+// ---------- structured data ----------
+const strip = (h = '') => String(h).replace(/<[^>]+>/g, ' ').replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&quot;/g, '"').replace(/\s+/g, ' ').trim();
+export const ORG_ID = () => SITE.domain + '/#org';
+export const orgSchema = () => ({
+  '@type': 'HomeAndConstructionBusiness', '@id': ORG_ID(), name: SITE.brand, url: SITE.domain + '/',
+  logo: SITE.domain + '/assets/icon-512.png', image: photo('house-glass', 1200, 630),
+  description: 'Проектирование, монтаж и сервис умного дома: отопление и котельная, тёплые полы, баня и сауна, ворота и видеонаблюдение, подогрев дорожек и водостоков, защита от протечек.',
+  areaServed: { '@type': 'Country', name: 'Россия' }, priceRange: '₽₽₽', currenciesAccepted: 'RUB',
+  ...(SITE.legalName ? { legalName: SITE.legalName } : {}),
+  ...(SITE.phone ? { telephone: SITE.phone } : {}),
+  ...(SITE.email ? { email: SITE.email } : {}),
+  ...(SITE.sameAs && SITE.sameAs.length ? { sameAs: SITE.sameAs } : {}),
+  knowsAbout: ['умный дом', 'KNX', 'автоматизация отопления', 'удалённое управление котлом', 'умная баня', 'умные ворота', 'видеонаблюдение', 'обогрев кровли и водостоков', 'защита от протечек'],
+});
+export const buildSchema = ({ path, title, description, body, jsonld, crumbs, service }) => {
+  const url = SITE.domain + url_(path);
+  const out = [];
+  if (!path) out.push({ '@context': 'https://schema.org', '@graph': [orgSchema(), { '@type': 'WebSite', '@id': SITE.domain + '/#website', url: SITE.domain + '/', name: SITE.brand, inLanguage: 'ru', publisher: { '@id': ORG_ID() } }] });
+  if (path && path !== '404') {
+    const items = [{ name: 'Главная', url: SITE.domain + '/' }].concat((crumbs || [[strip(title).split(' · ')[0], path]]).map(([n, p]) => ({ name: n, url: SITE.domain + url_(p) })));
+    out.push({ '@context': 'https://schema.org', '@type': 'BreadcrumbList', itemListElement: items.map((it, i) => ({ '@type': 'ListItem', position: i + 1, name: it.name, item: it.url })) });
+  }
+  if (service) {
+    out.push({ '@context': 'https://schema.org', '@type': 'Service', name: service.name, serviceType: service.type || service.name, description: service.description || description, url,
+      provider: { '@type': 'HomeAndConstructionBusiness', '@id': ORG_ID(), name: SITE.brand, url: SITE.domain + '/' }, areaServed: { '@type': 'Country', name: 'Россия' },
+      ...(service.min ? { offers: { '@type': 'Offer', priceCurrency: 'RUB', price: service.min, priceSpecification: { '@type': 'PriceSpecification', priceCurrency: 'RUB', minPrice: service.min, ...(service.max ? { maxPrice: service.max } : {}), valueAddedTaxIncluded: true }, url } } : {}) });
+  }
+  const qa = [...String(body).matchAll(/<details[^>]*><summary>([\s\S]*?)<\/summary><div class="faq__a">([\s\S]*?)<\/div><\/details>/g)];
+  if (qa.length) out.push({ '@context': 'https://schema.org', '@type': 'FAQPage', mainEntity: qa.map((m) => ({ '@type': 'Question', name: strip(m[1]).replace(/^[«"]|[»"]$/g, ''), acceptedAnswer: { '@type': 'Answer', text: strip(m[2]) } })) });
+  if (jsonld) out.push(jsonld);
+  return out;
+};
+const url_ = (p) => url(p);
+const metrikaTag = (id) => `<script>(function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};m[i].l=1*new Date();for(var j=0;j<document.scripts.length;j++){if(document.scripts[j].src===r){return;}}k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)})(window,document,"script","https://mc.yandex.ru/metrika/tag.js","ym");ym(${id},"init",{clickmap:true,trackLinks:true,accurateTrackBounce:true,webvisor:true});</script><noscript><div><img src="https://mc.yandex.ru/watch/${id}" style="position:absolute;left:-9999px;" alt=""></div></noscript>`;
+
 // ---------- page layout ----------
-export const layout = ({ path, title, description, body, ogPhoto = 'hero-house-night', bodyClass = '', jsonld }) => {
+export const layout = ({ path, title, description, body, ogPhoto = 'hero-house-night', bodyClass = '', jsonld, crumbs, service, noindex = false }) => {
+  const schema = buildSchema({ path, title, description, body, jsonld, crumbs, service });
+  const robots = (noindex || !SITE.indexable) ? '<meta name="robots" content="noindex, follow">' : '<meta name="robots" content="index, follow, max-image-preview:large">';
   const canonical = SITE.domain + url(path);
   const navHtml = NAV.map((n) => {
     if (n.children) {
@@ -167,6 +206,7 @@ export const layout = ({ path, title, description, body, ogPhoto = 'hero-house-n
   const footerCols = [
     { h: 'Решения', links: [['house', 'Умный загородный дом'], ['apartments', 'Умная квартира'], ['offices', 'Умный офис']] },
     { h: 'Системы', links: [['heating', 'Отопление и климат'], ['banya', 'Баня, сауна и спа'], ['territory', 'Ворота, камеры, участок'], ['approach', 'Как мы работаем']] },
+    { h: 'Популярное', links: [['kotel-udalenno', 'Удалённое управление котлом'], ['teplyj-pol', 'Умный тёплый пол'], ['videonablyudenie', 'Видеонаблюдение для дома'], ['umnye-vorota', 'Умные ворота'], ['obogrev-krovli', 'Обогрев кровли и водостоков'], ['zashchita-ot-protechek', 'Защита от протечек']] },
     { h: 'Компания', links: [['projects', 'Проекты'], ['journal', 'Журнал'], ['partners', 'Дизайнерам и строителям'], ['pricing', 'Стоимость'], ['contact', 'Оставить заявку'], ['privacy', 'Политика конфиденциальности']] },
   ];
 
@@ -177,6 +217,7 @@ export const layout = ({ path, title, description, body, ogPhoto = 'hero-house-n
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>${esc(title)}</title>
 <meta name="description" content="${esc(description)}">
+${robots}
 <link rel="canonical" href="${canonical}">
 <meta property="og:type" content="website">
 <meta property="og:title" content="${esc(title)}">
@@ -184,14 +225,22 @@ export const layout = ({ path, title, description, body, ogPhoto = 'hero-house-n
 <meta property="og:image" content="${photo(ogPhoto, 1200, 630)}">
 <meta property="og:url" content="${canonical}">
 <meta property="og:locale" content="ru_RU">
+<meta property="og:site_name" content="${SITE.brand}">
+<meta property="og:image:alt" content="${esc(title)}">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="theme-color" content="#0C1116">
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="/assets/icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
+<link rel="manifest" href="/site.webmanifest">
+${SITE.yandexVerification ? `<meta name="yandex-verification" content="${SITE.yandexVerification}">` : ''}
+${SITE.googleVerification ? `<meta name="google-site-verification" content="${SITE.googleVerification}">` : ''}
 <link rel="preconnect" href="https://images.unsplash.com">
 <link rel="preload" href="/assets/fonts/prata-cyrillic-400-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="/assets/fonts/manrope-cyrillic-wght-normal.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="/assets/site.css?v=${BUILD_ID}">
-${jsonld ? `<script type="application/ld+json">${JSON.stringify(jsonld)}</script>` : ''}
+${schema.map((j) => `<script type="application/ld+json">${JSON.stringify(j).replace(/</g, '\\u003c')}</script>`).join('\n')}
+${SITE.metrika ? metrikaTag(SITE.metrika) : ''}
 </head>
 <body class="${bodyClass}" data-lang="ru">
 <a class="skip" href="#main">К содержимому</a>
@@ -243,7 +292,7 @@ ${body}
   </div>
 </footer>
 <a class="m-cta" href="#lead" data-mcta>Оставить заявку ${icon('arrow')}</a>
-<script>window.SITE=${JSON.stringify({ formEndpoint: SITE.formEndpoint, contactUrl: url('contact') })};</script>
+<script>window.SITE=${JSON.stringify({ formEndpoint: SITE.formEndpoint, contactUrl: url('contact'), metrika: SITE.metrika || 0 })};</script>
 <script src="/assets/site.js?v=${BUILD_ID}" defer></script>
 </body>
 </html>`;

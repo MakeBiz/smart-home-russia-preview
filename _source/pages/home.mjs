@@ -1,4 +1,5 @@
 import { url, img, btn, hero, statusPanel, sectionHead, features, split, ctaBand, eyebrow, icon } from '../lib.mjs';
+import { relatedBlock } from './usecases.mjs';
 import { journalCards, projectCards } from './shared.mjs';
 
 export default {
@@ -57,7 +58,7 @@ ${hero({
         ${scenes.map((s, i) => `<button class="scenes__tab" role="tab" id="tab-${s.id}" aria-controls="pane-${s.id}" aria-selected="${i === 0}" ${i ? 'tabindex="-1"' : ''}><span class="scenes__time">${s.time}</span><span class="scenes__who">${s.who}<small>${s.sub}</small></span></button>`).join('')}
       </div>
       <div class="scenes__panels">
-        ${scenes.map((s, i) => `<div class="scenes__pane" role="tabpanel" id="pane-${s.id}" aria-labelledby="tab-${s.id}" ${i ? 'hidden' : ''}><div class="scenes__panel">${img(s.photo, '', { w: 1400, sizes: '(min-width: 900px) 60vw, 100vw' })}<div class="scenes__card"><h3>${s.h}</h3><ul class="scenes__acts">${s.acts.map((a) => `<li><span>${a[0]}</span><b>${a[1]}</b></li>`).join('')}</ul></div></div></div>`).join('')}
+        ${scenes.map((s, i) => `<div class="scenes__pane" role="tabpanel" id="pane-${s.id}" aria-labelledby="tab-${s.id}" ${i ? 'hidden' : ''}><div class="scenes__panel">${img(s.photo, `${s.time}: ${s.who}`, { w: 1400, sizes: '(min-width: 900px) 60vw, 100vw' })}<div class="scenes__card"><h3>${s.h}</h3><ul class="scenes__acts">${s.acts.map((a) => `<li><span>${a[0]}</span><b>${a[1]}</b></li>`).join('')}</ul></div></div></div>`).join('')}
       </div>
     </div>
   </div>
@@ -113,7 +114,7 @@ ${split({
       { p: 'house', photo: 'hero-house-night', k: 'Загородные дома и коттеджи', h: 'Умный загородный дом', d: 'Отопление по комнатам, котельная, баня, ворота, камеры, участок и ИИ-консьерж для всей семьи.' },
       { p: 'apartments', photo: 'moscow-embankment', k: 'Квартиры и пентхаусы', h: 'Умная квартира', d: 'Тёплые полы, свет, шторы, климат и защита от протечек. Компактный отработанный пакет за несколько недель.' },
       { p: 'offices', photo: 'moscow-city-dawn', k: 'Офисы и штаб-квартиры', h: 'Умный офис', d: 'Переговорные готовы вовремя, пропуска и гостевой Wi-Fi, отопление и свет не работают в пустых помещениях.' },
-    ].map((s) => `<a class="seg" href="${url(s.p)}">${img(s.photo, '', { w: 1200, sizes: '(min-width: 980px) 33vw, 100vw' })}<div class="seg__body"><span class="seg__k">${s.k}</span><h3>${s.h}</h3><p>${s.d}</p><span class="seg__more">Подробнее ${icon('arrow')}</span></div></a>`).join('')}
+    ].map((s) => `<a class="seg" href="${url(s.p)}">${img(s.photo, s.h, { w: 1200, sizes: '(min-width: 980px) 33vw, 100vw' })}<div class="seg__body"><span class="seg__k">${s.k}</span><h3>${s.h}</h3><p>${s.d}</p><span class="seg__more">Подробнее ${icon('arrow')}</span></div></a>`).join('')}
   </div>
 </section>
 
@@ -166,11 +167,13 @@ ${split({
   </div>
 </section>
 
+${relatedBlock(['kotel-udalenno', 'videonablyudenie', 'umnye-vorota', 'teplyj-pol', 'obogrev-krovli', 'zashchita-ot-protechek'], 'Популярные решения.', 'Что чаще всего автоматизируют')}
+
 ${ctaBand()}
 `;
     return {
-      title: 'Умный дом под ключ: загородные дома, квартиры и офисы · Smart Home',
-      description: 'Умный дом под ключ в России: отопление по комнатам и тёплые полы, баня и сауна с прогревом к приезду, умные ворота, видеонаблюдение, подогрев дорожек, ИИ-консьерж. Проект, монтаж и сервис.',
+      title: 'Умный дом под ключ в России: цены, проект и монтаж · Smart Home',
+      description: 'Умный дом под ключ для загородного дома, квартиры и офиса: отопление и котёл, тёплые полы, баня, ворота, видеонаблюдение. Проект, монтаж, сервис. От 690 000 ₽.',
       body,
       ogPhoto: 'house-glass',
     };

@@ -1,4 +1,4 @@
-import { url, img, btn, esc, sectionHead, ctaBand, eyebrow } from '../lib.mjs';
+import { url, img, btn, esc, sectionHead, ctaBand, eyebrow, photo } from '../lib.mjs';
 import { JOURNAL } from '../content/journal.mjs';
 import { PROJECTS } from '../content/projects.mjs';
 import { journalCard, journalCards, projectCards, projectCard, fmtDate } from './shared.mjs';
@@ -26,7 +26,7 @@ ${plainHead([[null, 'Журнал']], 'Журнал', 'Новости, идеи 
   </div>
 </section>
 ${ctaBand()}`;
-    return { title: `Журнал · ${SITE.brand}`, description: 'Статьи об умном доме: отопление и котельная, баня и сауна, подогрев дорожек, ворота и камеры, квартиры.', body, bodyClass: 'page-plain', ogPhoto: first.photo };
+    return { title: `Журнал об умном доме: отопление, баня, участок · ${SITE.brand}`, description: 'Статьи об умном доме в российском климате: котёл и отопление, баня и сауна, подогрев дорожек и водостоков, ворота и камеры, тёплые полы в квартире.', body, bodyClass: 'page-plain', ogPhoto: first.photo };
   },
 };
 
@@ -44,8 +44,8 @@ ${plainHead([[url('journal'), 'Журнал']], `${a.cat} · ${fmtDate(a.date)} 
   </div>
 </section>
 ${ctaBand()}`;
-    const jsonld = { '@context': 'https://schema.org', '@type': 'Article', headline: a.title, datePublished: a.date, inLanguage: 'ru', publisher: { '@type': 'Organization', name: SITE.brand } };
-    return { title: `${a.title} · ${SITE.brand}`, description: a.excerpt, body, bodyClass: 'page-plain', ogPhoto: a.photo, jsonld };
+    const jsonld = { '@context': 'https://schema.org', '@type': 'Article', headline: a.title, description: a.excerpt, datePublished: a.date, dateModified: a.updated || a.date, inLanguage: 'ru', image: photo(a.photo, 1200, 630), articleSection: a.cat, mainEntityOfPage: SITE.domain + url('journal/' + a.slug), author: { '@type': 'Organization', name: SITE.brand, url: SITE.domain + '/' }, publisher: { '@type': 'Organization', name: SITE.brand, logo: { '@type': 'ImageObject', url: SITE.domain + '/assets/icon-512.png' } } };
+    return { title: a.title.length > 55 ? a.title : `${a.title} · ${SITE.brand}`, description: a.excerpt, body, bodyClass: 'page-plain', ogPhoto: a.photo, jsonld };
   },
 }));
 
@@ -58,7 +58,7 @@ ${plainHead([[null, 'Проекты']], 'Проекты', 'Дома, котор�
   <div class="wrap">${projectCards()}</div>
 </section>
 ${ctaBand()}`;
-    return { title: `Проекты · ${SITE.brand}`, description: 'Проекты умных загородных домов, квартир и офисов: состав, сценарии и бюджеты.', body, bodyClass: 'page-plain', ogPhoto: 'house-stars' };
+    return { title: `Проекты умного дома: загородный дом, квартира, офис · ${SITE.brand}`, description: 'Проекты умного дома: загородный дом с баней и участком, квартира на этапе ремонта, офис 900 м². Что делает каждый объект и сколько это стоит.', body, bodyClass: 'page-plain', ogPhoto: 'house-stars' };
   },
 };
 
@@ -74,7 +74,7 @@ ${p.concept ? '<p class="note" style="margin-top:0;border:0;padding:0">Конц�
 ${p.body}
 <div class="hero__ctas">${btn('#lead', 'Обсудить похожий проект', 'primary')}${btn(url('pricing'), 'Рассчитать мой дом', 'ghost')}</div>
 </div></article>
-<div class="gallery">${p.gallery.map((g) => `<div class="gallery__img">${img(g, '', { w: 1000, ratio: 4 / 3, sizes: '33vw' })}</div>`).join('')}</div>
+<div class="gallery">${p.gallery.map((g, i) => `<div class="gallery__img">${img(g, `${p.title}: фото ${i + 1}`, { w: 1000, ratio: 4 / 3, sizes: '33vw' })}</div>`).join('')}</div>
 <section class="section tone-deep">
   <div class="wrap">
     ${sectionHead({ kicker: 'Другие проекты', title: 'Посмотрите другой тип пространства.' })}

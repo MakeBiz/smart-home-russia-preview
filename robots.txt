@@ -1,4 +1,86 @@
 User-agent: *
 Allow: /
 Disallow: /_source/
+
+User-agent: Yandex
+Allow: /
+Disallow: /_source/
+Clean-param: utm_source&utm_medium&utm_campaign&utm_content&utm_term&yclid&gclid&etext&from
+
+User-agent: GPTBot
+Allow: /
+Disallow: /_source/
+
+User-agent: OAI-SearchBot
+Allow: /
+Disallow: /_source/
+
+User-agent: ChatGPT-User
+Allow: /
+Disallow: /_source/
+
+User-agent: ClaudeBot
+Allow: /
+Disallow: /_source/
+
+User-agent: Claude-SearchBot
+Allow: /
+Disallow: /_source/
+
+User-agent: Claude-User
+Allow: /
+Disallow: /_source/
+
+User-agent: anthropic-ai
+Allow: /
+Disallow: /_source/
+
+User-agent: PerplexityBot
+Allow: /
+Disallow: /_source/
+
+User-agent: Perplexity-User
+Allow: /
+Disallow: /_source/
+
+User-agent: Google-Extended
+Allow: /
+Disallow: /_source/
+
+User-agent: Applebot-Extended
+Allow: /
+Disallow: /_source/
+
+User-agent: YandexAdditional
+Allow: /
+Disallow: /_source/
+
+User-agent: YandexGPT
+Allow: /
+Disallow: /_source/
+
+User-agent: GigaChat
+Allow: /
+Disallow: /_source/
+
+User-agent: Bytespider
+Allow: /
+Disallow: /_source/
+
+User-agent: CCBot
+Allow: /
+Disallow: /_source/
+
+User-agent: meta-externalagent
+Allow: /
+Disallow: /_source/
+
+User-agent: DuckAssistBot
+Allow: /
+Disallow: /_source/
+
+User-agent: MistralAI-User
+Allow: /
+Disallow: /_source/
+
 Sitemap: https://smarthome-russia.ru/sitemap.xml

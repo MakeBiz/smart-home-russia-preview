@@ -2,6 +2,14 @@
 export const SITE = {
   brand: 'Smart Home',
   domain: 'https://smarthome-russia.ru', // replace with the real domain before launch
+  // false = noindex on every page (preview on github.io). Switch to true when the real domain is live.
+  indexable: false,
+  // Analytics and webmaster verification: fill in after the domain is connected
+  metrika: 0,
+  yandexVerification: '',
+  googleVerification: '',
+  // Social profiles of the brand (VK, Telegram channel, Dzen...) for Organization.sameAs
+  sameAs: [],
   // Contacts. Leave empty to hide. Telegram: username without @. Phone: +7 ...
   telegram: '',
   phone: '',

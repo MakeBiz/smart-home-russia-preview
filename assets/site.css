@@ -712,3 +712,17 @@ input[type="range"]::-moz-range-thumb { width: 18px; height: 18px; border-radius
 .related__item h3::after { content: '→'; color: var(--aqua); font-family: var(--f-body); }
 .related__item:hover { background: rgba(239, 232, 220, .04); }
 @media (max-width: 640px) { .ptable--price td.num { white-space: normal; max-width: 42vw; line-height: 1.3; } }
+
+/* cases & news */
+.head-row { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: end; gap: 12px 24px; }
+.head-row > p { margin: 0 0 clamp(44px, 6vw, 80px); }
+.chips--filter { margin-bottom: 36px; }
+.empty-note { border: 1px solid var(--line); padding: clamp(28px, 4vw, 48px); max-width: 860px; }
+.empty-note .display-2 { margin: 0 0 14px; }
+.empty-note p { color: var(--muted); max-width: 62ch; }
+.chips-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.tag { display: inline-block; padding: 9px 14px; border: 1px solid var(--line-strong); text-decoration: none; font-size: 14px; }
+.tag:hover { border-color: var(--aqua); color: var(--aqua); }
+.article-body blockquote footer { margin-top: 12px; font: 500 12px/1.4 var(--f-body); letter-spacing: .14em; text-transform: uppercase; color: var(--muted); }
+.card[hidden] { display: none; }
+@media (max-width: 640px) { .head-row > p { margin: -20px 0 28px; } .chips--filter { grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); } }

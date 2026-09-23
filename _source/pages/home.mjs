@@ -1,6 +1,8 @@
 import { url, img, btn, hero, statusPanel, sectionHead, features, split, ctaBand, eyebrow, icon } from '../lib.mjs';
 import { relatedBlock } from './usecases.mjs';
-import { journalCards, projectCards } from './shared.mjs';
+import { journalCards } from './shared.mjs';
+import { caseCards } from './cases.mjs';
+import { newsCards, hasNews } from './news.mjs';
 
 export default {
   path: '',
@@ -145,11 +147,25 @@ ${split({
 
 <section class="section tone-deep">
   <div class="wrap">
-    ${sectionHead({ kicker: 'Проекты', title: 'Как это выглядит в реальном доме.' })}
-    ${projectCards()}
+    <div class="head-row">
+      ${sectionHead({ kicker: 'Кейсы', title: 'Как это выглядит в реальном доме.' })}
+      <p><a class="link" href="${url('cases')}">Все кейсы</a></p>
+    </div>
+    ${caseCards(3)}
   </div>
 </section>
 
+${hasNews() ? `<section class="section">
+  <div class="wrap">
+    <div class="head-row">
+      ${sectionHead({ kicker: 'Новости', title: 'Что нового в Smart Home.' })}
+      <p><a class="link" href="${url('news')}">Все новости</a></p>
+    </div>
+    ${newsCards(3)}
+  </div>
+</section>
+
+` : ''}
 <section class="section">
   <div class="wrap">
     <div style="display:flex;flex-wrap:wrap;justify-content:space-between;align-items:end;gap:24px">

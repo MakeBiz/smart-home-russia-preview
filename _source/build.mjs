@@ -13,25 +13,28 @@ import banya from './pages/banya.mjs';
 import territory from './pages/territory.mjs';
 import pricing from './pages/pricing.mjs';
 import { USECASE_PAGES, USECASES } from './pages/usecases.mjs';
-import { journalIndex, journalPages, projectsIndex, projectPages } from './pages/editorial.mjs';
+import { journalIndex, journalPages } from './pages/editorial.mjs';
+import { casesIndex, casePages, CASES } from './pages/cases.mjs';
+import { newsIndex, newsPages } from './pages/news.mjs';
+import { NEWS } from './content/news.mjs';
 import { approach, partners, contact, privacy, notFound } from './pages/company.mjs';
 import { JOURNAL } from './content/journal.mjs';
-import { PROJECTS } from './content/projects.mjs';
 
 const OUT = join(dirname(fileURLToPath(import.meta.url)), '..');
-const pages = [home, house, apartments, offices, heating, banya, territory, ...USECASE_PAGES, pricing, journalIndex, ...journalPages, projectsIndex, ...projectPages, approach, partners, contact, privacy];
+const pages = [home, house, apartments, offices, heating, banya, territory, ...USECASE_PAGES, pricing, casesIndex, ...casePages, newsIndex, ...newsPages, journalIndex, ...journalPages, approach, partners, contact, privacy];
 
 // breadcrumb labels
-const LABEL = { house: 'Загородный дом', apartments: 'Квартиры', offices: 'Офисы', heating: 'Отопление и климат', banya: 'Баня, сауна и спа', territory: 'Ворота, камеры, участок', pricing: 'Стоимость', journal: 'Журнал', projects: 'Проекты', approach: 'Как мы работаем', partners: 'Партнёрам', contact: 'Оставить заявку', privacy: 'Политика конфиденциальности' };
+const LABEL = { house: 'Загородный дом', apartments: 'Квартиры', offices: 'Офисы', heating: 'Отопление и климат', banya: 'Баня, сауна и спа', territory: 'Ворота, камеры, участок', pricing: 'Стоимость', journal: 'Журнал', cases: 'Кейсы', news: 'Новости', approach: 'Как мы работаем', partners: 'Партнёрам', contact: 'Оставить заявку', privacy: 'Политика конфиденциальности' };
 USECASES.forEach((u) => { LABEL[u.path] = u.crumb; });
 const crumbsFor = (path) => {
   const parts = path.split('/');
   if (parts[0] === 'journal' && parts[1]) return [['Журнал', 'journal'], [JOURNAL.find((a) => a.slug === parts[1]).title, path]];
-  if (parts[0] === 'projects' && parts[1]) return [['Проекты', 'projects'], [PROJECTS.find((a) => a.slug === parts[1]).title, path]];
+  if (parts[0] === 'cases' && parts[1]) return [['Кейсы', 'cases'], [CASES.find((a) => a.slug === parts[1]).title, path]];
+  if (parts[0] === 'news' && parts[1]) return [['Новости', 'news'], [NEWS.find((a) => a.slug === parts[1]).title, path]];
   return [[LABEL[path] || path, path]];
 };
 
-for (const d of ['house', 'apartments', 'offices', 'heating', 'banya', 'territory', 'pricing', 'journal', 'projects', 'approach', 'partners', 'contact', 'privacy', ...USECASES.map((u) => u.path)]) {
+for (const d of ['house', 'apartments', 'offices', 'heating', 'banya', 'territory', 'pricing', 'journal', 'cases', 'news', 'approach', 'partners', 'contact', 'privacy', ...USECASES.map((u) => u.path)]) {
   const p = join(OUT, d); try { if (existsSync(p)) rmSync(p, { recursive: true, force: true }); } catch (e) { /* no delete rights: files are overwritten */ }
 }
 
@@ -53,7 +56,7 @@ write('404.html', layout({ path: '404', ...notFound.render(), bodyClass: '', noi
 
 // sitemap with priorities
 const today = new Date().toISOString().slice(0, 10);
-const prio = (p) => (!p ? '1.0' : ['house', 'apartments', 'heating', 'banya', 'territory', 'pricing', ...USECASES.map((u) => u.path)].includes(p) ? '0.9' : p.startsWith('journal/') || p.startsWith('projects/') ? '0.6' : p === 'privacy' ? '0.2' : '0.7');
+const prio = (p) => (!p ? '1.0' : ['house', 'apartments', 'heating', 'banya', 'territory', 'pricing', ...USECASES.map((u) => u.path)].includes(p) ? '0.9' : p.startsWith('cases/') ? '0.7' : p.startsWith('journal/') || p.startsWith('news/') ? '0.6' : p === 'privacy' ? '0.2' : '0.7');
 write('sitemap.xml', `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${pages.map((pg) => `  <url><loc>${SITE.domain}${url(pg.path)}</loc><lastmod>${today}</lastmod><priority>${prio(pg.path)}</priority></url>`).join('\n')}\n</urlset>\n`);
 
 // robots: open for search and AI crawlers (GEO)
@@ -84,7 +87,13 @@ ${['house', 'apartments', 'offices'].map(line).join('\n')}
 ${['heating', 'banya', 'territory', ...USECASES.map((u) => u.path)].map(line).join('\n')}
 
 ## Стоимость и подход
-${['pricing', 'approach', 'projects', 'partners'].map(line).join('\n')}
+${['pricing', 'approach', 'cases', 'partners'].map(line).join('\n')}
+
+## Кейсы
+${CASES.map((c) => line('cases/' + c.slug)).join('\n')}
+
+## Новости
+${NEWS.map((a) => line('news/' + a.slug)).join('\n')}
 
 ## Журнал
 ${JOURNAL.map((a) => line('journal/' + a.slug)).join('\n')}

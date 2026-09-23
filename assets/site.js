@@ -62,6 +62,12 @@
   d.addEventListener('click', (e) => { const a = e.target.closest('a'); if (!a) return; const h = a.getAttribute('href') || ''; if (h.endsWith('#lead') || /contact\/?$/.test(h)) goal('cta_lead', { page: location.pathname }); else if (/pricing\/?(#.*)?$/.test(h)) goal('cta_pricing', { page: location.pathname }); });
   let focused = false; d.addEventListener('focusin', (e) => { if (!focused && e.target.closest && e.target.closest('[data-form]')) { focused = true; goal('form_focus', { page: location.pathname }); } });
 
+  /* cases filter by type */
+  d.querySelectorAll('[data-filter]').forEach((box) => box.addEventListener('change', (e) => {
+    const v = e.target.value;
+    d.querySelectorAll('[data-filtered] .card').forEach((c) => { c.hidden = v !== 'all' && c.dataset.type !== v; });
+  }));
+
   /* ---------- calculator ---------- */
   const calc = d.querySelector('[data-calc]');
   if (calc) {

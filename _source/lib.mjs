@@ -13,12 +13,16 @@ const PHOTOS = Object.fromEntries(
   readFileSync(new URL('./photos.txt', import.meta.url), 'utf8')
     .trim().split('\n').map((l) => l.split('|'))
 );
+// Local photos (real cases, news): pass a path under assets/, e.g. 'cases/dom-istra/01.webp'
+export const isLocal = (key) => key.includes('/');
 export const photo = (key, w = 1600, h) => {
+  if (isLocal(key)) return '/assets/' + key;
   const id = PHOTOS[key];
   if (!id) throw new Error('Unknown photo ' + key);
   return `https://images.unsplash.com/${id}?auto=format&fit=crop&w=${w}${h ? `&h=${h}` : ''}&q=72`;
 };
 export const img = (key, alt, { w = 1600, ratio, cls = '', eager = false, sizes = '100vw' } = {}) => {
+  if (isLocal(key)) return `<img class="${cls}" src="${photo(key)}" alt="${esc(alt)}" ${eager ? 'fetchpriority="high"' : 'loading="lazy"'} decoding="async">`;
   const widths = [640, 1024, 1600, 2200].filter((x) => x <= Math.max(w, 640));
   const h = (x) => (ratio ? Math.round(x / ratio) : undefined);
   const srcset = widths.map((x) => `${photo(key, x, h(x))} ${x}w`).join(', ');
@@ -39,7 +43,8 @@ export const NAV = [
     { path: 'territory', label: 'Ворота, камеры, участок', d: 'Доступ, видео, подогрев дорожек' },
     { path: 'approach', label: 'Как мы работаем', d: 'От обследования до сервиса' },
   ] },
-  { path: 'projects', label: 'Проекты' },
+  { path: 'cases', label: 'Кейсы' },
+  { path: 'news', label: 'Новости' },
   { path: 'journal', label: 'Журнал' },
   { path: 'pricing', label: 'Стоимость' },
 ];
@@ -207,7 +212,7 @@ export const layout = ({ path, title, description, body, ogPhoto = 'hero-house-n
     { h: 'Решения', links: [['house', 'Умный загородный дом'], ['apartments', 'Умная квартира'], ['offices', 'Умный офис']] },
     { h: 'Системы', links: [['heating', 'Отопление и климат'], ['banya', 'Баня, сауна и спа'], ['territory', 'Ворота, камеры, участок'], ['approach', 'Как мы работаем']] },
     { h: 'Популярное', links: [['kotel-udalenno', 'Удалённое управление котлом'], ['teplyj-pol', 'Умный тёплый пол'], ['videonablyudenie', 'Видеонаблюдение для дома'], ['umnye-vorota', 'Умные ворота'], ['obogrev-krovli', 'Обогрев кровли и водостоков'], ['zashchita-ot-protechek', 'Защита от протечек']] },
-    { h: 'Компания', links: [['projects', 'Проекты'], ['journal', 'Журнал'], ['partners', 'Дизайнерам и строителям'], ['pricing', 'Стоимость'], ['contact', 'Оставить заявку'], ['privacy', 'Политика конфиденциальности']] },
+    { h: 'Компания', links: [['cases', 'Кейсы'], ['news', 'Новости'], ['journal', 'Журнал'], ['partners', 'Дизайнерам и строителям'], ['pricing', 'Стоимость'], ['contact', 'Оставить заявку'], ['privacy', 'Политика конфиденциальности']] },
   ];
 
   return `<!doctype html>
@@ -222,7 +227,7 @@ ${robots}
 <meta property="og:type" content="website">
 <meta property="og:title" content="${esc(title)}">
 <meta property="og:description" content="${esc(description)}">
-<meta property="og:image" content="${photo(ogPhoto, 1200, 630)}">
+<meta property="og:image" content="${isLocal(ogPhoto) ? SITE.domain + photo(ogPhoto) : photo(ogPhoto, 1200, 630)}">
 <meta property="og:url" content="${canonical}">
 <meta property="og:locale" content="ru_RU">
 <meta property="og:site_name" content="${SITE.brand}">

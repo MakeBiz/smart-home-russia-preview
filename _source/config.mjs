@@ -1,9 +1,9 @@
 // Global site settings. Change the brand, contacts and domain here, then rebuild.
 export const SITE = {
   brand: 'Smart Home',
-  domain: 'https://smarthome-russia.ru', // replace with the real domain before launch
+  domain: 'https://homethinks.ru',
   // false = noindex on every page (preview on github.io). Switch to true when the real domain is live.
-  indexable: false,
+  indexable: true,
   // Analytics and webmaster verification: fill in after the domain is connected
   metrika: 0,
   yandexVerification: '',

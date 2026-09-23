@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+Disallow: /_source/
+Sitemap: https://smarthome-russia.ru/sitemap.xml

@@ -15,7 +15,15 @@ const LINKS = {
   'journal/heated-paths': ['Как не платить за обогрев впустую', 'Статья о подогреве дорожек и водостоков'],
   'journal/boiler-winter': ['Котёл остановился в феврале', 'Разбор аварии по минутам'],
 };
-USECASES.forEach((u) => { LINKS[u.path] = [u.crumb, u.lead.split('. ')[0] + '.']; });
+const TEASER = {
+  'kotel-udalenno': 'Прогрев к приезду, погодозависимый режим и сигнал об аварии инженеру',
+  'teplyj-pol': 'Водяной и электрический, по расписанию и своя температура в каждой зоне',
+  videonablyudenie: 'Уличные камеры до −40°, аналитика и архив в доме',
+  'umnye-vorota': 'Открытие по номеру машины, гостевые коды и видеодомофон',
+  'obogrev-krovli': 'Кровля, водостоки и дорожки по датчикам осадков, без лишних счетов',
+  'zashchita-ot-protechek': 'Краны с электроприводом, датчики и защита труб от мороза',
+};
+USECASES.forEach((u) => { LINKS[u.path] = [u.crumb, TEASER[u.path]]; });
 
 export const relatedBlock = (paths, title = 'Смотрите также', kicker = 'Связанные решения') => `
 <section class="section section--tight">

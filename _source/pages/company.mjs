@@ -1,21 +1,5 @@
-import { url, btn, hero, sectionHead, features, split, ctaBand, eyebrow, tgLink } from '../lib.mjs';
+import { url, btn, hero, sectionHead, features, split, ctaBand, eyebrow, leadForm } from '../lib.mjs';
 import { SITE } from '../config.mjs';
-
-export const contactForm = ({ partner = false } = {}) => {
-  const opts = partner
-    ? ['Дизайнер интерьера', 'Архитектор', 'Строительная компания', 'Девелопер или застройщик КП', 'Установщик котлов, бань, ворот', 'Другое']
-    : ['Загородный дом', 'Таунхаус', 'Квартира', 'Офис', 'Только баня или сауна', 'Только ворота и камеры', 'Другое'];
-  return `
-  <form class="form" data-form novalidate>
-    <div class="field"><label for="f-name">Имя</label><input id="f-name" name="name" autocomplete="name" required></div>
-    <div class="field"><label for="f-phone">Телефон или Telegram</label><input id="f-phone" name="phone" type="tel" autocomplete="tel" required></div>
-    <div class="field"><label for="f-email">Email</label><input id="f-email" name="email" type="email" autocomplete="email"></div>
-    <div class="field"><label for="f-property">${partner ? 'Вы' : 'Объект'}</label><select id="f-property" name="property">${opts.map((o) => `<option>${o}</option>`).join('')}</select></div>
-    <div class="field field--full"><label for="f-message">${partner ? 'О проекте или компании' : 'Что должен уметь ваш дом?'}</label><textarea id="f-message" name="message"></textarea></div>
-    <div class="form__foot"><p>Отвечаем в течение рабочего дня. Отправляя форму, вы соглашаетесь на обработку персональных данных только для ответа на ваш запрос.</p><button class="btn btn--primary" type="submit"><span>Отправить заявку</span></button></div>
-    <p class="form__ok" data-ok hidden>Спасибо. Заявка у нас, свяжемся в течение рабочего дня.</p>
-  </form>`;
-};
 
 export const approach = {
   path: 'approach',
@@ -26,7 +10,7 @@ ${hero({
   kicker: 'Как мы работаем',
   title: 'Сначала ваш дом. <em>Потом оборудование.</em>',
   lead: 'Мы инженерная команда, а не магазин гаджетов. Начинаем с того, как вы живёте, проектируем системы вокруг этого, незаметно монтируем и остаёмся ответственными годами. За плечами команды несколько лет проектов в России.',
-  ctas: btn(url('contact'), 'Начать с разговора'),
+  ctas: btn('#lead', 'Начать с разговора'),
 })}
 
 <section class="section tone-light">
@@ -84,7 +68,7 @@ ${hero({
   kicker: 'Дизайнерам, архитекторам и строителям',
   title: 'Ваш проект, <em>который оживает.</em>',
   lead: 'Заказчик хочет умный дом. Вы хотите, чтобы интерьер остался ровно таким, каким вы его нарисовали, а стройка не сорвала сроки. Мы делаем и то, и другое, и никогда не встаём между вами и клиентом.',
-  ctas: btn('#partner-form', 'Стать партнёром'),
+  ctas: btn('#lead', 'Стать партнёром'),
 })}
 
 <section class="section tone-light">
@@ -112,10 +96,10 @@ ${hero({
   </div>
 </section>
 
-<section class="section tone-deep" id="partner-form">
+<section class="section tone-deep" id="lead">
   <div class="wrap contact-grid">
     <header class="shead">${eyebrow('Партнёрская программа')}<h2 class="display-2">Давайте встретимся на вашем следующем проекте.</h2><p class="lead">Расскажите о студии или компании. Мы приедем с образцами и короткой презентацией.</p></header>
-    ${contactForm({ partner: true })}
+    ${leadForm({ partner: true, comment: true, dark: true })}
   </div>
 </section>
 `;
@@ -126,38 +110,61 @@ ${hero({
 export const contact = {
   path: 'contact',
   render() {
-    const tg = tgLink();
     const body = `
-<section class="article-head">
+<section class="article-head" id="lead">
   <div class="wrap contact-grid">
     <div>
-      <nav class="crumb" aria-label="Навигация"><a href="${url()}">Главная</a><span>/</span><span>Контакты</span></nav>
+      <nav class="crumb" aria-label="Навигация"><a href="${url()}">Главная</a><span>/</span><span>Заявка</span></nav>
       ${eyebrow('Консультация')}
       <h1 class="display-1" style="font-size:clamp(2.3rem,4.4vw,4rem)">Расскажите о своём доме.</h1>
-      <p class="lead">Сначала короткий звонок. Затем, если это имеет смысл, приезжает инженер, и вы получаете понятный состав работ и бюджет.</p>
+      <p class="lead">Оставьте имя и телефон, остальное обсудим голосом. Если удобнее переписка, добавьте ник в Telegram, и инженер напишет туда.</p>
       <ul class="contact-list">
-        ${SITE.phone ? `<li><span>Телефон</span><a href="tel:${SITE.phone.replace(/[\s()-]/g, '')}">${SITE.phone}</a></li>` : ''}
-        ${tg ? `<li><span>Telegram</span><a href="${tg}" target="_blank" rel="noopener">Написать нам</a></li>` : ''}
-        ${SITE.email ? `<li><span>Email</span><a href="mailto:${SITE.email}">${SITE.email}</a></li>` : ''}
-        <li><span>Где</span><b>${SITE.address}</b></li>
-        <li><span>Часы работы</span><b>${SITE.hours}</b></li>
+        <li><span>Ответ</span><b>в течение рабочего дня</b></li>
+        <li><span>Консультация</span><b>бесплатно, 20-40 минут</b></li>
+        <li><span>Работаем с</span><b>домами, квартирами и офисами</b></li>
       </ul>
     </div>
-    <div style="padding-top:clamp(0px,6vw,90px)">${contactForm()}</div>
+    <div style="padding-top:clamp(0px,6vw,90px)">${leadForm({ comment: true })}</div>
   </div>
 </section>
 <section class="section tone-light section--tight">
   <div class="wrap">
     ${sectionHead({ kicker: 'Что дальше', title: 'Три шага до понятного ответа.' })}
     <ol class="steps">
-      <li><h3>Звонок</h3><p>В течение рабочего дня звоним, чтобы понять объект и что он должен уметь.</p></li>
+      <li><h3>Звонок или сообщение</h3><p>В течение рабочего дня связываемся удобным вам способом, чтобы понять объект и что он должен уметь.</p></li>
       <li><h3>Выезд</h3><p>Инженер обследует котельную, щит, сеть и участок и встречается с вашим дизайнером или прорабом, если они есть.</p></li>
       <li><h3>Предложение</h3><p>Состав, сцены, сроки и построчная смета, которые мы презентуем лично.</p></li>
     </ol>
   </div>
 </section>
 `;
-    return { title: `Контакты · ${SITE.brand}`, description: 'Запишитесь на консультацию по умному дому для загородного дома, квартиры или офиса.', body, bodyClass: 'page-plain', ogPhoto: 'house-snow-night' };
+    return { title: `Оставить заявку · ${SITE.brand}`, description: 'Оставьте заявку на консультацию по умному дому для загородного дома, квартиры или офиса. Перезвоним или напишем в Telegram.', body, bodyClass: 'page-plain', ogPhoto: 'house-snow-night' };
+  },
+};
+
+export const privacy = {
+  path: 'privacy',
+  render() {
+    const who = SITE.legalName || 'владелец сайта (далее Оператор)';
+    const body = `
+<section class="article-head"><div class="wrap">
+  <nav class="crumb" aria-label="Навигация"><a href="${url()}">Главная</a><span>/</span><span>Политика конфиденциальности</span></nav>
+  <h1 class="display-1" style="font-size:clamp(2.1rem,4vw,3.4rem)">Политика обработки персональных данных</h1>
+</div></section>
+<article class="wrap"><div class="article-body">
+<p>Политика действует в отношении информации, которую ${who} получает от посетителей этого сайта через формы заявки. Обработка ведётся в соответствии с Федеральным законом № 152-ФЗ «О персональных данных».</p>
+<h2>Какие данные мы получаем</h2>
+<ul><li>имя;</li><li>номер телефона;</li><li>ник в Telegram, если вы его указали;</li><li>комментарий к заявке и результат расчёта в калькуляторе, если вы их оставили;</li><li>технические данные: страница отправки, источник перехода и метки рекламных кампаний.</li></ul>
+<h2>Зачем</h2>
+<p>Только чтобы связаться с вами по заявке, проконсультировать, подготовить расчёт и коммерческое предложение. Мы не передаём данные третьим лицам для рекламы и не продаём их.</p>
+<h2>Как храним</h2>
+<p>Заявка поступает в CRM-систему и рабочий мессенджер Оператора. Доступ к ним есть только у сотрудников, которые ведут вашу заявку. Данные хранятся, пока нужны для целей обработки, либо до отзыва согласия.</p>
+<h2>Ваши права</h2>
+<p>Вы можете в любой момент запросить, какие данные о вас хранятся, попросить исправить их или удалить, а также отозвать согласие на обработку, написав Оператору через форму на сайте с пометкой «Персональные данные».</p>
+<h2>Согласие</h2>
+<p>Отмечая галочку в форме и отправляя заявку, вы даёте согласие на обработку указанных данных на условиях этой политики.</p>
+</div></article>`;
+    return { title: `Политика конфиденциальности · ${SITE.brand}`, description: 'Политика обработки персональных данных посетителей сайта.', body, bodyClass: 'page-plain' };
   },
 };
 

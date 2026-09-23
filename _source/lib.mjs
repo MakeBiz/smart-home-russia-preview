@@ -118,18 +118,38 @@ export const faq = (items) => `
   </div>`;
 
 export const ctaBand = ({ title, lead, photoKey = 'house-snow-night' } = {}) => `
-  <section class="cta-band">
+  <section class="cta-band" id="lead">
     <div class="cta-band__media">${img(photoKey, '', { w: 2200 })}</div>
     <div class="cta-band__veil"></div>
-    <div class="wrap cta-band__inner">
-      <h2 class="display-2">${title || 'Расскажите о своём доме.<br>Дальше мы возьмём всё на себя.'}</h2>
-      <p class="lead">${lead || 'Звонок на 20 минут, затем выезд инженера на объект. Вы получаете понятный состав работ, ориентир бюджета и план, который встраивается в график стройки или ремонта.'}</p>
-      <div class="hero__ctas">
-        ${btn(url('contact'), 'Записаться на консультацию', 'primary')}
-        ${btn(url('pricing'), 'Рассчитать мой дом', 'ghost')}
+    <div class="wrap cta-band__inner cta-band__inner--form">
+      <div class="cta-band__copy">
+        <h2 class="display-2">${title || 'Расскажите о своём доме.<br>Дальше мы возьмём всё на себя.'}</h2>
+        <p class="lead">${lead || 'Оставьте имя и телефон. Инженер перезвонит, задаст несколько вопросов и назовёт ориентир бюджета. Удобнее переписка: укажите ник в Telegram.'}</p>
+        <p class="cta-band__alt"><a class="link" href="${url('pricing')}">Или посчитайте бюджет сами в калькуляторе</a></p>
       </div>
+      <div class="cta-band__form">${leadForm({ dark: true })}</div>
     </div>
   </section>`;
+
+// ---------- lead form (name, phone, telegram) ----------
+let FORM_N = 0;
+export const leadForm = ({ partner = false, comment = false, dark = false } = {}) => {
+  const n = ++FORM_N;
+  const opts = ['Дизайнер интерьера', 'Архитектор', 'Строительная компания', 'Застройщик коттеджного посёлка', 'Установщик котлов, бань, ворот', 'Другое'];
+  return `
+  <form class="form lead-form ${dark ? 'lead-form--dark' : ''}" data-form novalidate>
+    <div class="field"><label for="f${n}-name">Имя</label><input id="f${n}-name" name="name" autocomplete="name" required placeholder="Как к вам обращаться"></div>
+    <div class="field"><label for="f${n}-phone">Телефон</label><input id="f${n}-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" required placeholder="+7 (___) ___-__-__" data-phone></div>
+    <div class="field field--full"><label for="f${n}-tg">Ник в Telegram <small>необязательно, если удобнее переписка</small></label><input id="f${n}-tg" name="telegram" placeholder="@username" autocomplete="off" autocapitalize="off" autocorrect="off" spellcheck="false"></div>
+    ${partner ? `<div class="field field--full"><label for="f${n}-role">Вы</label><select id="f${n}-role" name="role">${opts.map((o) => `<option>${o}</option>`).join('')}</select></div>` : ''}
+    ${comment ? `<div class="field field--full"><label for="f${n}-msg">${partner ? 'О проекте или компании' : 'Что нужно сделать'} <small>необязательно</small></label><textarea id="f${n}-msg" name="message" placeholder="${partner ? 'Студия, город, ближайшие проекты' : 'Дом, квартира или офис, стадия, что хочется автоматизировать'}"></textarea></div>` : ''}
+    <div class="hp" aria-hidden="true"><label for="f${n}-web">Сайт</label><input id="f${n}-web" name="website" tabindex="-1" autocomplete="off"></div>
+    <label class="consent field--full"><input type="checkbox" name="consent" required><span>Согласен на обработку персональных данных по <a href="${url('privacy')}" target="_blank">политике конфиденциальности</a></span></label>
+    <div class="form__foot"><p>Перезвоним или напишем в течение рабочего дня.</p><button class="btn btn--primary" type="submit"><span>Отправить заявку</span>${icon('arrow')}</button></div>
+    <p class="form__err" data-err hidden></p>
+    <p class="form__ok" data-ok hidden>Спасибо, заявка у нас. Свяжемся с вами в течение рабочего дня.</p>
+  </form>`;
+};
 
 // ---------- page layout ----------
 export const layout = ({ path, title, description, body, ogPhoto = 'hero-house-night', bodyClass = '', jsonld }) => {
@@ -147,7 +167,7 @@ export const layout = ({ path, title, description, body, ogPhoto = 'hero-house-n
   const footerCols = [
     { h: 'Решения', links: [['house', 'Умный загородный дом'], ['apartments', 'Умная квартира'], ['offices', 'Умный офис']] },
     { h: 'Системы', links: [['heating', 'Отопление и климат'], ['banya', 'Баня, сауна и спа'], ['territory', 'Ворота, камеры, участок'], ['approach', 'Как мы работаем']] },
-    { h: 'Компания', links: [['projects', 'Проекты'], ['journal', 'Журнал'], ['partners', 'Дизайнерам и строителям'], ['pricing', 'Стоимость'], ['contact', 'Контакты']] },
+    { h: 'Компания', links: [['projects', 'Проекты'], ['journal', 'Журнал'], ['partners', 'Дизайнерам и строителям'], ['pricing', 'Стоимость'], ['contact', 'Оставить заявку'], ['privacy', 'Политика конфиденциальности']] },
   ];
 
   return `<!doctype html>
@@ -193,9 +213,9 @@ ${jsonld ? `<script type="application/ld+json">${JSON.stringify(jsonld)}</script
   <nav class="wrap mnav__list">
     ${NAV.flatMap((n) => (n.children ? n.children : [n])).map((c) => `<a href="${url(c.path)}">${c.label}</a>`).join('')}
     <a href="${url('partners')}">Дизайнерам и строителям</a>
-    <a href="${url('contact')}">Контакты</a>
+    <a href="${url('contact')}">Оставить заявку</a>
   </nav>
-  <div class="wrap mnav__cta">${btn(url('contact'), 'Записаться на консультацию')}${btn(url('pricing'), 'Рассчитать мой дом', 'ghost')}</div>
+  <div class="wrap mnav__cta">${btn(url('contact'), 'Оставить заявку')}${btn(url('pricing'), 'Рассчитать мой дом', 'ghost')}</div>
 </div>
 <main id="main">
 ${body}
@@ -210,7 +230,7 @@ ${body}
           ${SITE.phone ? `<a href="tel:${SITE.phone.replace(/[\s()-]/g, '')}">${SITE.phone}</a>` : ''}
           ${SITE.email ? `<a href="mailto:${SITE.email}">${SITE.email}</a>` : ''}
           ${tg ? `<a href="${tg}" target="_blank" rel="noopener">Telegram</a>` : ''}
-          <span>${SITE.address}</span>
+          <a href="${url('contact')}">Оставить заявку</a>
         </div>
       </div>
       ${footerCols.map((c) => `<div class="site-foot__col"><p class="eyebrow">${c.h}</p><ul>${c.links.map(([p, l]) => `<li><a href="${url(p)}">${l}</a></li>`).join('')}</ul></div>`).join('')}
@@ -222,8 +242,8 @@ ${body}
     </div>
   </div>
 </footer>
-${tg ? `<a class="wa-float" href="${tg}" target="_blank" rel="noopener" aria-label="Telegram">${icon('tg')}</a>` : ''}
-<script>window.SITE=${JSON.stringify({ telegram: SITE.telegram, email: SITE.email, formEndpoint: SITE.formEndpoint })};</script>
+<a class="m-cta" href="#lead" data-mcta>Оставить заявку ${icon('arrow')}</a>
+<script>window.SITE=${JSON.stringify({ formEndpoint: SITE.formEndpoint, contactUrl: url('contact') })};</script>
 <script src="/assets/site.js?v=${BUILD_ID}" defer></script>
 </body>
 </html>`;

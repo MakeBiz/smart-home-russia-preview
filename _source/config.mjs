@@ -7,7 +7,9 @@ export const SITE = {
   phone: '',
   email: '',
   address: 'Россия',
-  // Optional form endpoint (Bitrix24 webhook, n8n, Make, Formspree). Empty = Telegram/email fallback.
-  formEndpoint: '',
+  // Юрлицо для политики конфиденциальности, например: ООО «...», ИНН ...
+  legalName: '',
+  // Lead endpoint: relay that sends the lead to Telegram and Bitrix24
+  formEndpoint: 'https://smart-home-leads.vercel.app/api/lead',
   hours: 'Пн-Пт 9:00-20:00, Сб 10:00-16:00',
 };

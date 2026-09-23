@@ -13,12 +13,12 @@ import banya from './pages/banya.mjs';
 import territory from './pages/territory.mjs';
 import pricing from './pages/pricing.mjs';
 import { journalIndex, journalPages, projectsIndex, projectPages } from './pages/editorial.mjs';
-import { approach, partners, contact, notFound } from './pages/company.mjs';
+import { approach, partners, contact, privacy, notFound } from './pages/company.mjs';
 
 const OUT = join(dirname(fileURLToPath(import.meta.url)), '..');
-const pages = [home, house, apartments, offices, heating, banya, territory, pricing, journalIndex, ...journalPages, projectsIndex, ...projectPages, approach, partners, contact];
+const pages = [home, house, apartments, offices, heating, banya, territory, pricing, journalIndex, ...journalPages, projectsIndex, ...projectPages, approach, partners, contact, privacy];
 
-for (const d of ['house', 'apartments', 'offices', 'heating', 'banya', 'territory', 'pricing', 'journal', 'projects', 'approach', 'partners', 'contact']) {
+for (const d of ['house', 'apartments', 'offices', 'heating', 'banya', 'territory', 'pricing', 'journal', 'projects', 'approach', 'partners', 'contact', 'privacy']) {
   const p = join(OUT, d); try { if (existsSync(p)) rmSync(p, { recursive: true, force: true }); } catch (e) { /* no delete rights: files are overwritten */ }
 }
 

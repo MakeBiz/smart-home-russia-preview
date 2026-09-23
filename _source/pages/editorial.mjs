@@ -72,7 +72,7 @@ ${plainHead([[url('projects'), 'Проекты']], `${p.type}${p.concept ? ' · 
 <article class="wrap"><div class="article-body">
 ${p.concept ? '<p class="note" style="margin-top:0;border:0;padding:0">Концепт-проект: эталонная конфигурация, на которой мы объясняем состав и бюджет. Фотографии иллюстративные.</p>' : ''}
 ${p.body}
-<div class="hero__ctas">${btn(url('contact'), 'Обсудить похожий проект', 'primary')}${btn(url('pricing'), 'Рассчитать мой дом', 'ghost')}</div>
+<div class="hero__ctas">${btn('#lead', 'Обсудить похожий проект', 'primary')}${btn(url('pricing'), 'Рассчитать мой дом', 'ghost')}</div>
 </div></article>
 <div class="gallery">${p.gallery.map((g) => `<div class="gallery__img">${img(g, '', { w: 1000, ratio: 4 / 3, sizes: '33vw' })}</div>`).join('')}</div>
 <section class="section tone-deep">

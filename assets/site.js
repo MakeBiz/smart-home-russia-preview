@@ -186,22 +186,97 @@
     compute(); office();
   }
 
-  /* ---------- contact form ---------- */
+  /* ---------- lead forms: name, phone, telegram → relay → Telegram + Bitrix24 ---------- */
+  const S = window.SITE || {};
+  // remember UTM and referrer of the first visit in this session
+  try {
+    const qs = new URLSearchParams(location.search);
+    const utm = {};
+    ['utm_source', 'utm_medium', 'utm_campaign', 'utm_content', 'utm_term', 'yclid', 'gclid'].forEach((k) => { if (qs.get(k)) utm[k] = qs.get(k); });
+    if (Object.keys(utm).length) sessionStorage.setItem('shr_utm', JSON.stringify(utm));
+    if (!sessionStorage.getItem('shr_ref')) sessionStorage.setItem('shr_ref', document.referrer || '');
+  } catch (e) { /* storage unavailable */ }
+
+  const digits = (v) => (v || '').replace(/\D/g, '');
+  const fmtPhone = (v) => {
+    let d = digits(v);
+    if (!d) return '';
+    if (d[0] === '8') d = '7' + d.slice(1);
+    if (d[0] === '9') d = '7' + d;
+    if (d[0] !== '7') return '+' + d.slice(0, 15);
+    d = d.slice(1, 11);
+    let out = '+7';
+    if (d.length) out += ' (' + d.slice(0, 3);
+    if (d.length >= 3) out += ')';
+    if (d.length > 3) out += ' ' + d.slice(3, 6);
+    if (d.length > 6) out += '-' + d.slice(6, 8);
+    if (d.length > 8) out += '-' + d.slice(8, 10);
+    return out;
+  };
+  const cleanTg = (v) => {
+    let t = (v || '').trim().replace(/^https?:\/\/(www\.)?(t|telegram)\.me\//i, '').replace(/^@+/, '').replace(/[/?#].*$/, '');
+    return t ? '@' + t : '';
+  };
+
+  d.querySelectorAll('[data-phone]').forEach((inp) => {
+    inp.addEventListener('focus', () => { if (!inp.value) inp.value = '+7 ('; });
+    inp.addEventListener('blur', () => { if (digits(inp.value).length <= 1) inp.value = ''; });
+    inp.addEventListener('input', () => { const end = inp.selectionEnd === inp.value.length; inp.value = fmtPhone(inp.value); if (end) inp.setSelectionRange(inp.value.length, inp.value.length); });
+  });
+
   d.querySelectorAll('[data-form]').forEach((f) => {
-    let est = ''; try { est = sessionStorage.getItem('shr_estimate') || ''; } catch (e) { /* ignore */ }
-    const msg = f.querySelector('[name="message"]'); if (est && msg && !msg.value) msg.value = est;
+    const err = f.querySelector('[data-err]');
+    const btnEl = f.querySelector('button[type="submit"]');
+    const showErr = (msg) => { err.textContent = msg; err.hidden = !msg; };
+    f.addEventListener('input', (e) => { e.target.classList && e.target.classList.remove('is-bad'); if (e.target.name === 'consent') e.target.closest('.consent').classList.remove('is-bad'); showErr(''); });
     f.addEventListener('submit', async (e) => {
       e.preventDefault();
-      const data = Object.fromEntries(new FormData(f).entries());
-      const text = [T('New enquiry', 'Новая заявка'), data.name, data.phone, data.email, data.property, data.message].filter(Boolean).join('\n');
-      const done = () => { f.querySelector('[data-ok]').hidden = false; f.querySelectorAll('.field, .form__foot').forEach((x) => (x.hidden = true)); };
-      const S = window.SITE || {};
-      if (S.formEndpoint) {
-        try { await fetch(S.formEndpoint, { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify({ ...data, lang, page: location.pathname }) }); done(); return; } catch (err) { /* fall through */ }
-      }
-      if (S.telegram) { try { navigator.clipboard && navigator.clipboard.writeText(text); } catch (err) { /* ignore */ } window.open(`https://t.me/${S.telegram.replace(/^@/, '')}`, '_blank', 'noopener'); done(); return; }
-      if (S.email) { location.href = `mailto:${S.email}?subject=${encodeURIComponent(T('Smart home enquiry', 'Заявка на умный дом'))}&body=${encodeURIComponent(text)}`; done(); return; }
-      done();
+      const fd = new FormData(f);
+      const name = (fd.get('name') || '').trim();
+      const phoneDigits = digits(fd.get('phone'));
+      const tg = cleanTg(fd.get('telegram'));
+      const bad = [];
+      if (name.length < 2) bad.push(f.querySelector('[name="name"]'));
+      if (phoneDigits.length < 11) bad.push(f.querySelector('[name="phone"]'));
+      bad.forEach((x) => x.classList.add('is-bad'));
+      if (bad.length) { showErr(bad.length === 2 ? 'Укажите имя и телефон.' : name.length < 2 ? 'Укажите, как к вам обращаться.' : 'Проверьте номер телефона: нужно 11 цифр.'); bad[0].focus(); return; }
+      if (!fd.get('consent')) { f.querySelector('.consent').classList.add('is-bad'); showErr('Отметьте согласие на обработку данных.'); return; }
+      if (fd.get('website')) { done(); return; } // bot
+      let estimate = '', utm = {}, ref = '';
+      try { estimate = sessionStorage.getItem('shr_estimate') || ''; utm = JSON.parse(sessionStorage.getItem('shr_utm') || '{}'); ref = sessionStorage.getItem('shr_ref') || ''; } catch (x) { /* ignore */ }
+      const payload = {
+        name, phone: '+' + (phoneDigits[0] === '8' ? '7' + phoneDigits.slice(1) : phoneDigits), telegram: tg,
+        role: fd.get('role') || '', message: (fd.get('message') || '').trim(), estimate,
+        page: location.href.split('#')[0], title: document.title, referrer: ref, utm,
+      };
+      function done() { f.querySelector('[data-ok]').hidden = false; f.querySelectorAll('.field, .form__foot, .consent').forEach((x) => (x.hidden = true)); showErr(''); try { if (window.ym && S.metrika) window.ym(S.metrika, 'reachGoal', 'lead'); } catch (x) { /* ignore */ } }
+      if (!S.formEndpoint) { showErr('Форма ещё не подключена. Попробуйте позже.'); return; }
+      btnEl.disabled = true; btnEl.querySelector('span').textContent = 'Отправляем…';
+      try {
+        const ctrl = new AbortController(); const tm = setTimeout(() => ctrl.abort(), 15000);
+        const r = await fetch(S.formEndpoint, { method: 'POST', headers: { 'Content-Type': 'text/plain;charset=UTF-8' }, body: JSON.stringify(payload), signal: ctrl.signal });
+        clearTimeout(tm);
+        const j = await r.json().catch(() => ({}));
+        if (!r.ok || !j.ok) throw new Error(j.error || 'send');
+        done();
+      } catch (x) {
+        showErr('Не получилось отправить заявку. Проверьте интернет и попробуйте ещё раз.');
+      } finally { btnEl.disabled = false; btnEl.querySelector('span').textContent = 'Отправить заявку'; }
     });
   });
+
+  /* mobile sticky CTA: to the form on this page, hidden while a form or the calculator bar is on screen */
+  const mcta = d.querySelector('[data-mcta]');
+  if (mcta) {
+    const target = d.getElementById('lead');
+    if (!target) mcta.href = S.contactUrl || '/contact/';
+    const vis = new Map();
+    const upd = () => { const calcBar = d.querySelector('[data-calcbar]'); const anyVis = [...vis.values()].some(Boolean); mcta.classList.toggle('is-hidden', anyVis || (calcBar && !calcBar.hidden) || scrollY < 200); };
+    if ('IntersectionObserver' in window) {
+      const io3 = new IntersectionObserver((es) => { es.forEach((e) => vis.set(e.target, e.isIntersecting)); upd(); });
+      d.querySelectorAll('[data-form], .result, .hero').forEach((el) => io3.observe(el));
+    }
+    window.addEventListener('scroll', upd, { passive: true }); upd();
+    const bar = d.querySelector('[data-calcbar]'); if (bar && 'MutationObserver' in window) new MutationObserver(upd).observe(bar, { attributes: true, attributeFilter: ['hidden'] });
+  }
 })();

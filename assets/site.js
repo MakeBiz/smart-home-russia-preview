@@ -155,7 +155,7 @@
       const summary = `Расчёт: ${names[type]}, ${rooms} комн., ${W} штор, ${Z} зон отопления, баня: ${banya}, камер: ${cams}, уровень: ${tier} → ${rubRange(loV, hiV)}`;
       calc.dataset.summary = summary;
       setBar(rubRange(loV, hiV), 'home');
-      try { sessionStorage.setItem('shr_estimate', summary); } catch (e) { /* storage unavailable */ }
+      try { if (calc.dataset.touched) sessionStorage.setItem('shr_estimate', summary); } catch (e) { /* storage unavailable */ }
     };
 
     const office = () => {
@@ -172,11 +172,11 @@
       const w = out('o_warn'); w.hidden = area <= 1500; w.textContent = 'Для площади больше 1 500 м² цену считаем после обследования инженерии здания.';
       setBar(rubRange(L, H), 'office');
       calc.dataset.summary = `Расчёт офиса: ${area} м², ${scope === 'full' ? 'полный умный офис' : 'адресная оптимизация'} → ${rubRange(L, H)}`;
-      try { sessionStorage.setItem('shr_estimate', calc.dataset.summary); } catch (e) { /* storage unavailable */ }
+      try { if (calc.dataset.touched) sessionStorage.setItem('shr_estimate', calc.dataset.summary); } catch (e) { /* storage unavailable */ }
     };
 
-    calc.addEventListener('input', (e) => { if (e.target.closest('[data-office]')) office(); else compute(); });
-    calc.addEventListener('change', (e) => { if (e.target.closest('[data-office]')) office(); else compute(); });
+    calc.addEventListener('input', (e) => { calc.dataset.touched = '1'; if (e.target.closest('[data-office]')) office(); else compute(); });
+    calc.addEventListener('change', (e) => { calc.dataset.touched = '1'; if (e.target.closest('[data-office]')) office(); else compute(); });
     const h = location.hash.replace('#', '');
     if (['apartment', 'townhouse', 'house'].includes(h)) {
       const r = calc.querySelector(`[name="type"][value="${h}"]`); if (r) r.checked = true;

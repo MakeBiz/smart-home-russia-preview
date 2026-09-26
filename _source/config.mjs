@@ -5,8 +5,8 @@ export const SITE = {
   // false = noindex on every page (preview on github.io). Switch to true when the real domain is live.
   indexable: true,
   // Analytics and webmaster verification: fill in after the domain is connected
-  metrika: 0,
-  yandexVerification: '',
+  metrika: 113092885,
+  yandexVerification: 'b400dc620143332c',
   googleVerification: '',
   // Social profiles of the brand (VK, Telegram channel, Dzen...) for Organization.sameAs
   sameAs: [],

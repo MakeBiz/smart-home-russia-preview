@@ -56,10 +56,21 @@
     }, 1800);
   });
 
-  /* analytics goals (Yandex Metrika): lead, lead_error, calc_start, calc_office, cta_lead, cta_pricing, form_focus */
+  /* analytics goals (Yandex Metrika): lead, form_submit, lead_error, form_focus, calc_start, calc_office, cta_lead, cta_pricing, scroll_75, engaged_60, faq_open, outbound */
   const goal = (name, params) => { try { const S0 = window.SITE || {}; if (window.ym && S0.metrika) window.ym(S0.metrika, 'reachGoal', name, params || {}); } catch (e) { /* ignore */ } };
   window.shGoal = goal;
-  d.addEventListener('click', (e) => { const a = e.target.closest('a'); if (!a) return; const h = a.getAttribute('href') || ''; if (h.endsWith('#lead') || /contact\/?$/.test(h)) goal('cta_lead', { page: location.pathname }); else if (/pricing\/?(#.*)?$/.test(h)) goal('cta_pricing', { page: location.pathname }); });
+  const where = (el) => el.closest('[data-calc]') ? 'calc' : el.closest('[data-mcta]') ? 'sticky' : el.closest('header') ? 'header' : el.closest('footer') ? 'footer' : el.closest('.hero, [class*="hero"]') ? 'hero' : 'content';
+  d.addEventListener('click', (e) => {
+    const a = e.target.closest('a'); if (!a) return; const h = a.getAttribute('href') || '';
+    const p = { page: location.pathname, from: where(a) };
+    if (h.endsWith('#lead') || /contact\/?(#.*)?$/.test(h)) goal('cta_lead', p);
+    else if (/pricing\/?(#.*)?$/.test(h)) goal('cta_pricing', p);
+    if (/^https?:/.test(h) && !h.includes(location.host)) goal('outbound', { page: location.pathname, url: h.split('?')[0] });
+  });
+  /* engagement: scroll depth 75%, 60 seconds on page, FAQ opens */
+  let sc75 = false; addEventListener('scroll', () => { if (sc75) return; const de = d.documentElement; if ((scrollY + innerHeight) / de.scrollHeight >= 0.75) { sc75 = true; goal('scroll_75', { page: location.pathname }); } }, { passive: true });
+  setTimeout(() => { if (d.visibilityState === 'visible') goal('engaged_60', { page: location.pathname }); }, 60000);
+  d.querySelectorAll('details').forEach((dt) => dt.addEventListener('toggle', () => { if (dt.open && !dt.dataset.g) { dt.dataset.g = '1'; goal('faq_open', { page: location.pathname, q: (dt.querySelector('summary') || {}).textContent || '' }); } }));
   let focused = false; d.addEventListener('focusin', (e) => { if (!focused && e.target.closest && e.target.closest('[data-form]')) { focused = true; goal('form_focus', { page: location.pathname }); } });
 
   /* cases filter by type */
@@ -253,7 +264,8 @@
       bad.forEach((x) => x.classList.add('is-bad'));
       if (bad.length) { showErr(bad.length === 2 ? 'Укажите имя и телефон.' : name.length < 2 ? 'Укажите, как к вам обращаться.' : 'Проверьте номер телефона: нужно 11 цифр.'); bad[0].focus(); return; }
       if (!fd.get('consent')) { f.querySelector('.consent').classList.add('is-bad'); showErr('Отметьте согласие на обработку данных.'); return; }
-      if (fd.get('website')) { done(); return; } // bot
+      if (fd.get('website')) { f.querySelector('[data-ok]').hidden = false; return; } // bot: no goal
+      goal('form_submit', { page: location.pathname });
       let estimate = '', utm = {}, ref = '';
       try { estimate = sessionStorage.getItem('shr_estimate') || ''; utm = JSON.parse(sessionStorage.getItem('shr_utm') || '{}'); ref = sessionStorage.getItem('shr_ref') || ''; } catch (x) { /* ignore */ }
       const payload = {
